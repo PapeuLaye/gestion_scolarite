@@ -1,0 +1,45 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                             http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+  <servlet>
+    <servlet-name>EtudiantServlet</servlet-name>
+    <servlet-class>com.gestion_scolarite.controller.EtudiantServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>EtudiantServlet</servlet-name>
+    <url-pattern>/etudiants</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>EnseignantServlet</servlet-name>
+    <servlet-class>com.gestion_scolarite.controller.EnseignantServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EnseignantServlet</servlet-name>
+    <url-pattern>/enseignants</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MatiereServlet</servlet-name>
+    <servlet-class>com.gestion_scolarite.controller.MatiereServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MatiereServlet</servlet-name>
+    <url-pattern>/matieres</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>NoteServlet</servlet-name>
+    <servlet-class>com.gestion_scolarite.controller.NoteServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>NoteServlet</servlet-name>
+    <url-pattern>/notes</url-pattern>
+  </servlet-mapping>
+
+</web-app>
