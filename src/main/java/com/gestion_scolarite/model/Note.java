@@ -5,16 +5,18 @@ public class Note {
     private int idEtudiant;
     private int idMatiere;
     private double note;
+    private String nomMatiere;
 
     // Constructeurs
     public Note() {
     }
 
-    public Note(int id, int idEtudiant, int idMatiere, double note) {
+    public Note(int id, int idEtudiant, int idMatiere, double note, String nomMatiere) {
         this.id = id;
         this.idEtudiant = idEtudiant;
         this.idMatiere = idMatiere;
         this.note = note;
+        this.nomMatiere = nomMatiere;
     }
 
     // Getters et Setters
@@ -59,5 +61,13 @@ public class Note {
                 ", idMatiere=" + idMatiere +
                 ", note=" + note +
                 '}';
+    }
+
+    public String getNomMatiere() {
+        return nomMatiere;
+    }
+
+    public void setNomMatiere(String nomMatiere) {
+        this.nomMatiere = nomMatiere;
     }
 }

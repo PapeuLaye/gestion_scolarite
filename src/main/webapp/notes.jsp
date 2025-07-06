@@ -23,14 +23,16 @@
             for (Note note : notesList) {
     %>
     <tr>
-        <td><%= note.getIdMatiere() %>
+        <td><%= note.getNomMatiere() %>
         </td>
         <td><%= note.getNote() %>
         </td>
         <td>
             <a href="notes?action=edit&noteId=<%= note.getId() %>">Modifier</a> |
-            <a href="notes?action=delete&id=<%= note.getId() %>&id=<%= note.getIdEtudiant() %>"
-               onclick="return confirm('Supprimer cette note ?');">Supprimer</a>
+            <a href="notes?action=delete&id=<%= note.getId() %>&idEtudiant=<%= note.getIdEtudiant() %>"
+               onclick="return confirm('Supprimer cette note ?');">
+                Supprimer
+            </a>
         </td>
     </tr>
     <%
@@ -49,6 +51,6 @@
 <p><strong>Moyenne générale :</strong> ${moyenne}</p>
 
 <br>
-<a href="ajouterNote.jsp?idEtudiant=${idEtudiant}">Ajouter une Note</a>
+<a href="notes?action=add&idEtudiant=${idEtudiant}">Ajouter une Note</a>
 </body>
 </html>

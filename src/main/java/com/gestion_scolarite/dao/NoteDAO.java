@@ -29,7 +29,9 @@ public class NoteDAO {
     public List<Note> getNotesByEtudiant(int idEtudiant) {
         List<Note> notes = new ArrayList<>();
         try {
-            String query = "SELECT * FROM notes WHERE etudiant_id = ?";
+            String query = "SELECT n.*, m.nom AS nom_matiere FROM notes n " +
+                    "JOIN matieres m ON n.matiere_id = m.id " +
+                    "WHERE n.etudiant_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, idEtudiant);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -39,6 +41,7 @@ public class NoteDAO {
                 note.setIdEtudiant(resultSet.getInt("etudiant_id"));
                 note.setIdMatiere(resultSet.getInt("matiere_id"));
                 note.setNote(resultSet.getDouble("note"));
+                note.setNomMatiere(resultSet.getString("nom_matiere")); // ici c'est maintenant valide
                 notes.add(note);
             }
         } catch (SQLException e) {
@@ -46,6 +49,7 @@ public class NoteDAO {
         }
         return notes;
     }
+
 
     public void modifierNote(Note note) {
         try {

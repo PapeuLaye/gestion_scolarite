@@ -1,7 +1,9 @@
 package com.gestion_scolarite.controller;
 
 import com.gestion_scolarite.dao.NoteDAO;
+import com.gestion_scolarite.dao.MatiereDAO;
 import com.gestion_scolarite.model.Note;
+import com.gestion_scolarite.model.Matiere;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -11,20 +13,21 @@ import java.util.List;
 public class NoteServlet extends HttpServlet {
 
     private NoteDAO noteDAO;
+    private MatiereDAO matiereDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
         noteDAO = new NoteDAO();
+        matiereDAO = new MatiereDAO();
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        if (action == null) {
-            action = "list";
-        }
+        String action = request.getParameter("action");
+        if (action == null) action = "list";
 
         switch (action) {
             case "list":
@@ -37,28 +40,40 @@ public class NoteServlet extends HttpServlet {
                 request.getRequestDispatcher("/notes.jsp").forward(request, response);
                 break;
 
+            case "add":
+                int etudiantId = Integer.parseInt(request.getParameter("idEtudiant"));
+                List<Matiere> matieres = matiereDAO.getAllMatieres();
+                request.setAttribute("matieres", matieres);
+                request.setAttribute("etudiantId", etudiantId);
+                request.getRequestDispatcher("/ajouterNote.jsp").forward(request, response);
+                break;
+
             case "edit":
                 int noteId = Integer.parseInt(request.getParameter("noteId"));
                 Note note = noteDAO.getNoteById(noteId);
+                List<Matiere> matieresEdit = matiereDAO.getAllMatieres();
                 request.setAttribute("note", note);
+                request.setAttribute("matieres", matieresEdit);
                 request.getRequestDispatcher("/modifier_note.jsp").forward(request, response);
                 break;
 
             case "delete":
                 int id = Integer.parseInt(request.getParameter("id"));
+                int etuId = Integer.parseInt(request.getParameter("idEtudiant"));
                 noteDAO.supprimerNote(id);
-                response.sendRedirect("etudiants");
+                response.sendRedirect("notes?id=" + etuId);
                 break;
 
             default:
                 response.sendRedirect("etudiants");
                 break;
         }
-
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String action = request.getParameter("action");
 
         if ("save".equals(action)) {
@@ -68,9 +83,9 @@ public class NoteServlet extends HttpServlet {
             note.setNote(Float.parseFloat(request.getParameter("note")));
 
             noteDAO.ajouterNote(note);
-            response.sendRedirect("notes");
+            response.sendRedirect("notes?id=" + note.getIdEtudiant());
 
-        }else if ("update".equals(action)) {
+        } else if ("update".equals(action)) {
             Note note = new Note();
             note.setId(Integer.parseInt(request.getParameter("id")));
             note.setIdEtudiant(Integer.parseInt(request.getParameter("idEtudiant")));
@@ -80,6 +95,5 @@ public class NoteServlet extends HttpServlet {
             noteDAO.modifierNote(note);
             response.sendRedirect("notes?id=" + note.getIdEtudiant());
         }
-
     }
 }

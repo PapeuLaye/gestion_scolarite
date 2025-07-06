@@ -45,8 +45,8 @@
         <td><%= etudiant.getDateNaissance() %></td>
         <td class="actions">
             <a href="etudiants?action=edit&id=<%= etudiant.getId() %>">Modifier</a> |
-            <a href="etudiants?action=delete&id=<%= etudiant.getId() %>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?');">Supprimer</a>
-            <a href="notes?action=list&id=<%= etudiant.getId() %>">Mes Notes</a>
+            <a href="etudiants?action=delete&id=<%= etudiant.getId() %>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?');">Supprimer</a> |
+            <a href="notes?action=list&id=<%= etudiant.getId() %>">Notes</a>
 
         </td>
     </tr>

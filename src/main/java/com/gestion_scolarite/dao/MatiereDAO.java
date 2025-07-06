@@ -10,21 +10,21 @@ public class MatiereDAO {
     private Connection connection;
 
     public MatiereDAO() {
-        this.connection = DatabaseConnection.getConnection(); // Connexion à la base de données
+        this.connection = DatabaseConnection.getConnection();
     }
 
+    // Récupérer toutes les matières
     public List<Matiere> getAllMatieres() {
         List<Matiere> matieres = new ArrayList<>();
-        try {
-            String query = "SELECT * FROM matieres";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()) {
+        String query = "SELECT * FROM matieres";
+        try (PreparedStatement ps = connection.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
                 Matiere matiere = new Matiere();
-                matiere.setId(resultSet.getInt("id"));
-                matiere.setNom(resultSet.getString("nom"));
-                matiere.setCode(resultSet.getString("code"));
-                matiere.setCoefficient(resultSet.getInt("coefficient"));
+                matiere.setId(rs.getInt("id"));
+                matiere.setNom(rs.getString("nom"));
+                matiere.setCode(rs.getString("code"));
+                matiere.setCoefficient(rs.getInt("coefficient"));
                 matieres.add(matiere);
             }
         } catch (SQLException e) {
@@ -33,60 +33,60 @@ public class MatiereDAO {
         return matieres;
     }
 
+    // Récupérer une matière par ID
     public Matiere getMatiereById(int id) {
-        Matiere matiere = null;
-        try {
-            String query = "SELECT * FROM matieres WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                matiere = new Matiere();
-                matiere.setId(resultSet.getInt("id"));
-                matiere.setNom(resultSet.getString("nom"));
-                matiere.setCode(resultSet.getString("code"));
-                matiere.setCoefficient(resultSet.getInt("coefficient"));
+        String query = "SELECT * FROM matieres WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Matiere matiere = new Matiere();
+                matiere.setId(rs.getInt("id"));
+                matiere.setNom(rs.getString("nom"));
+                matiere.setCode(rs.getString("code"));
+                matiere.setCoefficient(rs.getInt("coefficient"));
+                return matiere;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return matiere;
+        return null;
     }
 
+    // Ajouter une matière
     public void ajouterMatiere(Matiere matiere) {
-        try {
-            String query = "INSERT INTO matieres (nom, code, coefficient) VALUES (?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, matiere.getNom());
-            preparedStatement.setString(2, matiere.getCode());
-            preparedStatement.setInt(3, matiere.getCoefficient());
-            preparedStatement.executeUpdate();
+        String query = "INSERT INTO matieres (nom, code, coefficient) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, matiere.getNom());
+            ps.setString(2, matiere.getCode());
+            ps.setFloat(3, matiere.getCoefficient());
+            ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // Modifier une matière
     public void modifierMatiere(Matiere matiere) {
-        try {
-            String query = "UPDATE matieres SET nom = ?, code = ?, coefficient = ? WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, matiere.getNom());
-            preparedStatement.setString(2, matiere.getCode());
-            preparedStatement.setInt(3, matiere.getCoefficient());
-            preparedStatement.setInt(4, matiere.getId());
-            preparedStatement.executeUpdate();
+        String query = "UPDATE matieres SET nom = ?, code = ?, coefficient = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, matiere.getNom());
+            ps.setString(2, matiere.getCode());
+            ps.setFloat(3, matiere.getCoefficient());
+            ps.setInt(4, matiere.getId());
+            ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // Supprimer une matière
     public void supprimerMatiere(int id) {
-        try {
-            String query = "DELETE FROM matieres WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, id);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e)               {
+        String query = "DELETE FROM matieres WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
