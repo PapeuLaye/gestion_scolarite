@@ -25,6 +25,7 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("utilisateur", user);
+            session.setAttribute("role", user.getRole());  // ✅ Ajout du rôle dans la session
 
             switch (user.getRole()) {
                 case "ADMIN":

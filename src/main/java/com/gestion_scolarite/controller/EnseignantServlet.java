@@ -67,7 +67,7 @@ public class EnseignantServlet extends HttpServlet {
                 enseignantDAO.modifierEnseignant(enseignant);
             } else {
                 // Ajouter nouvel enseignant
-                enseignantDAO.ajouterEnseignant(enseignant);
+                int enseignantId = enseignantDAO.ajouterEnseignant(enseignant);
 
                 // Créer un compte utilisateur automatiquement
                 Utilisateur utilisateur = new Utilisateur();
@@ -76,7 +76,7 @@ public class EnseignantServlet extends HttpServlet {
                 utilisateur.setRole("ENSEIGNANT");
 
                 UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
-                utilisateurDAO.ajouterUtilisateur(utilisateur);
+                utilisateurDAO.ajouterUtilisateur(utilisateur, enseignantId);
             }
 
             response.sendRedirect("enseignants");

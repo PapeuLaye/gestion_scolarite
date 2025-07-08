@@ -71,7 +71,7 @@ public class EtudiantServlet extends HttpServlet {
                 etudiantDAO.modifierEtudiant(etudiant);
             } else {
                 // Ajout d'un nouvel étudiant
-                etudiantDAO.ajouterEtudiant(etudiant);
+                int etudiantId = etudiantDAO.ajouterEtudiant(etudiant);
 
                 // Création automatique du compte utilisateur lié
                 Utilisateur utilisateur = new Utilisateur();
@@ -80,7 +80,7 @@ public class EtudiantServlet extends HttpServlet {
                 utilisateur.setRole("ETUDIANT");
 
                 UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
-                utilisateurDAO.ajouterUtilisateur(utilisateur);
+                utilisateurDAO.ajouterUtilisateur(utilisateur, etudiantId);
             }
 
             response.sendRedirect("etudiants");

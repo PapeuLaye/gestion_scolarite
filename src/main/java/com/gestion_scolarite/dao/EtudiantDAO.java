@@ -50,23 +50,37 @@ public class EtudiantDAO {
     }
 
     // Méthode pour ajouter un étudiant
-    public void ajouterEtudiant(Etudiant etudiant) {
-        if (!isConnectionValid()) return;
+    public int ajouterEtudiant(Etudiant etudiant) {
+        if (!isConnectionValid()) return -1;
 
         String query = "INSERT INTO etudiants (nom, prenom, email, matricule, date_naissance, classe) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        int idGenere = -1;
+
+        try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, etudiant.getNom());
             stmt.setString(2, etudiant.getPrenom());
             stmt.setString(3, etudiant.getEmail());
             stmt.setString(4, etudiant.getMatricule());
             stmt.setString(5, etudiant.getDateNaissance());
             stmt.setString(6, etudiant.getClasse());
-            stmt.executeUpdate();
-            System.out.println("✅ Étudiant ajouté avec succès !");
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        idGenere = generatedKeys.getInt(1);
+                        System.out.println("✅ Étudiant ajouté avec ID = " + idGenere);
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return idGenere;
     }
+
 
     // Méthode pour récupérer un étudiant par ID
     public Etudiant getEtudiantById(int id) {
@@ -109,19 +123,39 @@ public class EtudiantDAO {
             e.printStackTrace();
         }
     }
-    // Méthode pour supprimer un étudiant
+    // Méthode pour supprimer un étudiant avec suppression des dépendances
     public void supprimerEtudiant(int id) {
         if (!isConnectionValid()) return;
 
-        String query = "DELETE FROM etudiants WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int rowsDeleted = stmt.executeUpdate();
-            if (rowsDeleted > 0) {
-                System.out.println("✅ Étudiant supprimé avec succès !");
-            } else {
-                System.out.println("⚠️ Aucun étudiant trouvé avec cet ID.");
+        try {
+            // Étape 1 : Supprimer les notes liées à cet étudiant
+            String deleteNotes = "DELETE FROM notes WHERE etudiant_id = ?";
+            try (PreparedStatement psNotes = connection.prepareStatement(deleteNotes)) {
+                psNotes.setInt(1, id);
+                psNotes.executeUpdate();
+                System.out.println("🗑️ Notes supprimées pour l'étudiant ID: " + id);
             }
+
+            // Étape 2 : Supprimer le compte utilisateur lié à cet étudiant (optionnel)
+            String deleteUser = "DELETE FROM utilisateurs WHERE id = ?";
+            try (PreparedStatement psUser = connection.prepareStatement(deleteUser)) {
+                psUser.setInt(1, id);
+                psUser.executeUpdate();
+                System.out.println("🗑️ Utilisateur supprimé pour l'étudiant ID: " + id);
+            }
+
+            // Étape 3 : Supprimer l'étudiant
+            String deleteEtudiant = "DELETE FROM etudiants WHERE id = ?";
+            try (PreparedStatement psEtudiant = connection.prepareStatement(deleteEtudiant)) {
+                psEtudiant.setInt(1, id);
+                int rowsDeleted = psEtudiant.executeUpdate();
+                if (rowsDeleted > 0) {
+                    System.out.println("✅ Étudiant supprimé avec succès !");
+                } else {
+                    System.out.println("⚠️ Aucun étudiant trouvé avec cet ID.");
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -29,6 +29,9 @@ public class NoteServlet extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null) action = "list";
 
+        HttpSession session = request.getSession(false);
+        String role = (String) (session != null ? session.getAttribute("role") : null);
+
         switch (action) {
             case "list":
                 int idEtudiant = Integer.parseInt(request.getParameter("id"));
@@ -41,27 +44,33 @@ public class NoteServlet extends HttpServlet {
                 break;
 
             case "add":
-                int etudiantId = Integer.parseInt(request.getParameter("idEtudiant"));
-                List<Matiere> matieres = matiereDAO.getAllMatieres();
-                request.setAttribute("matieres", matieres);
-                request.setAttribute("etudiantId", etudiantId);
-                request.getRequestDispatcher("/ajouterNote.jsp").forward(request, response);
-                break;
-
             case "edit":
-                int noteId = Integer.parseInt(request.getParameter("noteId"));
-                Note note = noteDAO.getNoteById(noteId);
-                List<Matiere> matieresEdit = matiereDAO.getAllMatieres();
-                request.setAttribute("note", note);
-                request.setAttribute("matieres", matieresEdit);
-                request.getRequestDispatcher("/modifier_note.jsp").forward(request, response);
-                break;
-
             case "delete":
-                int id = Integer.parseInt(request.getParameter("id"));
-                int etuId = Integer.parseInt(request.getParameter("idEtudiant"));
-                noteDAO.supprimerNote(id);
-                response.sendRedirect("notes?id=" + etuId);
+                // 🔒 Protection : seuls les admins peuvent ajouter/modifier/supprimer
+                if (!"ADMIN".equals(role)) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès non autorisé");
+                    return;
+                }
+
+                if ("add".equals(action)) {
+                    int etudiantId = Integer.parseInt(request.getParameter("idEtudiant"));
+                    List<Matiere> matieres = matiereDAO.getAllMatieres();
+                    request.setAttribute("matieres", matieres);
+                    request.setAttribute("etudiantId", etudiantId);
+                    request.getRequestDispatcher("/ajouterNote.jsp").forward(request, response);
+                } else if ("edit".equals(action)) {
+                    int noteId = Integer.parseInt(request.getParameter("noteId"));
+                    Note note = noteDAO.getNoteById(noteId);
+                    List<Matiere> matieresEdit = matiereDAO.getAllMatieres();
+                    request.setAttribute("note", note);
+                    request.setAttribute("matieres", matieresEdit);
+                    request.getRequestDispatcher("/modifier_note.jsp").forward(request, response);
+                } else if ("delete".equals(action)) {
+                    int id = Integer.parseInt(request.getParameter("id"));
+                    int etuId = Integer.parseInt(request.getParameter("idEtudiant"));
+                    noteDAO.supprimerNote(id);
+                    response.sendRedirect("notes?id=" + etuId);
+                }
                 break;
 
             default:
@@ -70,9 +79,18 @@ public class NoteServlet extends HttpServlet {
         }
     }
 
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        String role = (String) (session != null ? session.getAttribute("role") : null);
+
+        if (!"ADMIN".equals(role)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès non autorisé");
+            return;
+        }
 
         String action = request.getParameter("action");
 

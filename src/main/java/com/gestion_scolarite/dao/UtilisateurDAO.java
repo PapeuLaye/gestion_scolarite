@@ -32,13 +32,14 @@ public class UtilisateurDAO {
         return null;
     }
 
-    public void ajouterUtilisateur(Utilisateur utilisateur) {
+    public void ajouterUtilisateur(Utilisateur utilisateur, int id) {
         try {
-            String query = "INSERT INTO utilisateurs (email, mot_de_passe, role) VALUES (?, ?, ?)";
+            String query = "INSERT INTO utilisateurs (id, email, mot_de_passe, role) VALUES (?, ?, ?, ?)";
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setString(1, utilisateur.getEmail());
-            ps.setString(2, utilisateur.getMotDePasse());
-            ps.setString(3, utilisateur.getRole());
+            ps.setInt(1, id);
+            ps.setString(2, utilisateur.getEmail());
+            ps.setString(3, utilisateur.getMotDePasse());
+            ps.setString(4, utilisateur.getRole());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

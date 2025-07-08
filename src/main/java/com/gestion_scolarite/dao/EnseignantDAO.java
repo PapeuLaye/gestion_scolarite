@@ -53,17 +53,27 @@ public class EnseignantDAO {
         return enseignant;
     }
 
-    public void ajouterEnseignant(Enseignant enseignant) {
+    // ✅ Méthode adaptée pour retourner l'ID généré
+    public int ajouterEnseignant(Enseignant enseignant) {
+        int generatedId = -1;
         try {
             String query = "INSERT INTO enseignants (nom, prenom, email) VALUES (?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, enseignant.getNom());
             preparedStatement.setString(2, enseignant.getPrenom());
             preparedStatement.setString(3, enseignant.getEmail());
-            preparedStatement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows > 0) {
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    generatedId = generatedKeys.getInt(1);
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return generatedId;
     }
 
     public void modifierEnseignant(Enseignant enseignant) {
