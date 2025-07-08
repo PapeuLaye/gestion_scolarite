@@ -1,8 +1,10 @@
 package com.gestion_scolarite.controller;
 
 import com.gestion_scolarite.dao.EnseignantDAO;
+import com.gestion_scolarite.dao.UtilisateurDAO;
 import com.gestion_scolarite.model.Enseignant;
 
+import com.gestion_scolarite.model.Utilisateur;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -59,12 +61,24 @@ public class EnseignantServlet extends HttpServlet {
             enseignant.setEmail(request.getParameter("email"));
 
             String id = request.getParameter("id");
+
             if (id != null && !id.isEmpty()) {
                 enseignant.setId(Integer.parseInt(id));
                 enseignantDAO.modifierEnseignant(enseignant);
             } else {
+                // Ajouter nouvel enseignant
                 enseignantDAO.ajouterEnseignant(enseignant);
+
+                // Créer un compte utilisateur automatiquement
+                Utilisateur utilisateur = new Utilisateur();
+                utilisateur.setEmail(enseignant.getEmail());
+                utilisateur.setMotDePasse("123456"); // mot de passe par défaut
+                utilisateur.setRole("ENSEIGNANT");
+
+                UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
+                utilisateurDAO.ajouterUtilisateur(utilisateur);
             }
+
             response.sendRedirect("enseignants");
         }
     }

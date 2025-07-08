@@ -31,4 +31,17 @@ public class UtilisateurDAO {
         }
         return null;
     }
+
+    public void ajouterUtilisateur(Utilisateur utilisateur) {
+        try {
+            String query = "INSERT INTO utilisateurs (email, mot_de_passe, role) VALUES (?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, utilisateur.getEmail());
+            ps.setString(2, utilisateur.getMotDePasse());
+            ps.setString(3, utilisateur.getRole());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
