@@ -1,8 +1,10 @@
 package com.gestion_scolarite.controller;
 
 import com.gestion_scolarite.dao.EtudiantDAO;
+import com.gestion_scolarite.dao.UtilisateurDAO;
 import com.gestion_scolarite.model.Etudiant;
 
+import com.gestion_scolarite.model.Utilisateur;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -61,14 +63,26 @@ public class EtudiantServlet extends HttpServlet {
             etudiant.setDateNaissance(request.getParameter("dateNaissance"));
             etudiant.setClasse(request.getParameter("classe"));
 
-            // Si l'étudiant existe, on le met à jour, sinon on l'ajoute
             String id = request.getParameter("id");
+
             if (id != null && !id.isEmpty()) {
+                // Mise à jour
                 etudiant.setId(Integer.parseInt(id));
-                etudiantDAO.modifierEtudiant(etudiant); // On peut aussi ajouter une méthode pour la mise à jour
+                etudiantDAO.modifierEtudiant(etudiant);
             } else {
+                // Ajout d'un nouvel étudiant
                 etudiantDAO.ajouterEtudiant(etudiant);
+
+                // Création automatique du compte utilisateur lié
+                Utilisateur utilisateur = new Utilisateur();
+                utilisateur.setEmail(etudiant.getEmail());
+                utilisateur.setMotDePasse("123456"); // mot de passe par défaut
+                utilisateur.setRole("ETUDIANT");
+
+                UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
+                utilisateurDAO.ajouterUtilisateur(utilisateur);
             }
+
             response.sendRedirect("etudiants");
         }
     }
